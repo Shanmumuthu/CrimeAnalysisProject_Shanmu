@@ -1,0 +1,198 @@
+---
+title: "Crime Analysis"
+author: "Shanmugavalli Muthu"
+date: '2022-06-29'
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+  'html_document: default': default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(knitr)
+library(formattable)
+library(ggplot2)
+library(tidyr)
+```
+## Summary
+
+Crime is one of the disturbing features of society that make life difficult for ordinary people. Although crimes are unpredictable, forecasting tools can help predict them. Theft, robbery, property damage, assault, and homicide can all be caused by a variety of factors. They also have a pattern in which the crime rate rises in a few months and then drops in others. This research or crime prediction is essential because it provides insight into why, when, and how criminal activities occur, aiding in improving the efficiency of criminal investigations and predicting the likelihood of future crimes. Government authorities can improve security in areas where crime is more prevalent by providing additional police coverage and surveillance cameras. In recent times, there has been a lot of crime analysis in order to reduce crimes in the future. The main aim of this study is to determine in which time period the crime rates peak and which socio-economic factors lead to most crime. The data is from the Chicago crime data set from 2008-2012 and used the linear regression method to analyze the data. The main findings would be which socio-economic index has a relationship with the crime rate and the time and pattern of the occurrence. The main aim of this study is to help the law enforcement authorities in hastening the investigation of crimes and identifying potential future criminal activity.
+
+Keywords: Data analysis, Crime analysis, Crime prediction, Forecasting.
+
+## Introduction
+
+Crimes are usually unpredictable. Some regions naturally encourage crime and it fluctuates with societal trends in human behavior. The goal of this study is to identify criminal tendencies in the Chicago crime dataset from 2008 to 2012. The locations in Chicago areas with a high rate of criminal activity, the most common types of crimes, and the distribution of crimes over time are all important types of information. A socioeconomic indicator dataset, as seen in table 1, has also been provided to us and provides information on the standard of living in each community in Chicago. Linear regression is used to discover significant correlations between predictor variables (socioeconomic indicators) and crime rates, which aids in crime reduction in the affected areas. 
+```{r echo=FALSE}
+## Socioeconomic indicator dataset from 2008 - 2012
+df1 <- read.csv("Crimes_-_2001_to_Present (1).csv")
+head(df1)
+```
+
+## Literature Review
+
+Analysis of crime and prediction were explained by some approaches like KNN, decision trees, support vector machines, and extra trees. Decision trees, KNN, and extra tree give good accuracy of results. Authors discussed workflow-data collection, data preprocessing, classification and pattern identification, prediction, and evaluation (Gahalot et al.,2020).
+ Research illustrates how Support Vector Machine, Fuzzy Theory, Artificial Neural Network (ANN), and multivariate time series help in crime analysis. They concluded that models’ results will be accurate only if they are highly trained. (Shamsuddin et al., 2017).
+The authors discussed crime distribution as in which months have more crimes and which months have fewer crimes. This was analyzed and visualized by using tableau software. They also looked at the crime rate by day and analyzed which days have higher crime rates. (Nwankwo et al., 2018).
+Data analytics plays an influential role in finding and making decisions in different circumstances. Appropriate data analytics tools and methods will help determine basic patterns and connections in datasets. (Sathyadevan et al., 2014).
+The study included many innovations for forecast models, with numerous driven by unique features such as GIS and Depp learning methods. They also covered a few topics under methodological models like exponential smoothing, Box Jenkins arima multivariate transfer models, neural networks, and cointegrated econometric models. (Gorr et al., 2003).
+This paper discussed CCMinner and its crime predictions and crime pattern analysis in order to provide support while making judgements regarding crime analysis. The authors discussed real-time crime case pattern analysis, including front-end and back-end users as well as the use of the Power BI tool. (Peiris et al., 2020).
+
+##Research Questions 
+
+•	Determine which time period(day) has higher crime rates compared to other days.
+•	To find whether there is a correlation between the crime rate and socioeconomic indicators.
+
+##Theory
+
+This study is investigating the relationship between a crime rate and socioeconomic indicators of public health.  This study includes:
+1.	Evaluate that there is 100% correlation between the crime rate and socioeconomic indicators.
+2.	Evaluate the correlation between the crime rate and socioeconomic indicators is null.
+It is the assumption that there is a relationship between criminal activities and the living condition in each community area. Linear regression is applied to find the correlations between interdependent variables (the socioeconomic indicators) and the dependent variable (crime rate).
+
+## Data
+
+For this study, Chicago crimes data to created from records of crimes cases by the Chicago Police Department from Crimes - 2001 to Present | City of Chicago | Data Portal. The data includes:
+
+```{r echo=FALSE}
+df1 <- read.csv("Crimes_-_2001_to_Present (1).csv")
+head(df1)
+```
+
+Census data for socioeconomic indicators in Chicago, 2008 – 2012 was retrieved from Census Data - Selected socioeconomic indicators in Chicago, 2008 – 2012 | City of Chicago | Data Portal. The data includes:
+
+```{r echo=FALSE}
+df2 <- read.csv("Census_Data_-_Selected_socioeconomic_indicators_in_Chicago__2008___2012.csv")
+head(df2)
+```
+
+Before creating a new dataset from the existing ones by merging, a new dataset was created to count how many crimes occur in each community:
+
+```{r echo=FALSE}
+df11 = df1 %>% group_by(Community.Area) %>% summarise(Crime.Rate = n())
+head(df11)
+```
+
+This data set was merged with the socioeconomic indicators data set which was used for regression model. All the N/A values were removed
+
+```{r echo=FALSE}
+df <-  merge(df11, df2, by ="Community.Area")
+DF <- df %>% na.omit()
+head(DF)
+```
+
+## Methodology
+
+In this study, we use multiple linear regression to model the relationship between a crime rate and socioeconomic variables (dependent and independent variables). The equation of simple linear regression is similar to that of the slope formula. However, the equation for multiple regression line formula is
+Y =a_1 X_1+ a_2 X_2+ a_3 X_3+ C 
+Where Y is dependent variable, X1 – X3 are independent variables, a1-a3 are slope and c is error/constant.
+Figure 1 (a) shows the distribution of crime rate from 2008 to 2012. Figure 1 (b) – (h) illustrates the correlation between socioeconomic indicators against the crime rate. For example, In Figure 1 (b) we can see that the there is a correlation between housing units with more than one person per room is plotted against the crime rate.
+
+```{r}
+ggplot(DF, aes(x=Crime.Rate))+geom_histogram(binwidth = 5000) + labs(x="Crime Rate")
+ggplot(DF, aes(x=PERCENT.OF.HOUSING.CROWDED, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=PERCENT.HOUSEHOLDS.BELOW.POVERTY, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=PERCENT.AGED.16..UNEMPLOYED, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=PER.CAPITA.INCOME, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=PERCENT.AGED.UNDER.18.OR.OVER.64, y=Crime.Rate)) + geom_point()
+ggplot(DF, aes(x=HARDSHIP.INDEX, y=Crime.Rate)) + geom_point()
+summary(DF)
+```
+
+## Results
+
+Crime dataset was used to visualize the patterns between 2008 to 2012 i.e. by crime rate by day. Before plotting the crime distribution by day, we have to format the date column which consists of date with timestamp to date. The present data is shown as:
+
+```{r}
+dff <- read.csv("crime data.csv")
+dff$date <- as.Date(dff$Date, format= "%m/%d/%Y")
+
+dff <- dff %>% group_by(date) %>% summarise(Crime.Rate = n())
+
+## Crime distribution by day from 2008 – 2012
+## From the plot, we find that crimes are more on new year, the first day compared to other days in a year. 
+plot(dff$date, dff$Crime.Rate, type = "l",xlab = "Date",ylab = "Crime Rate",main = "Rate of Crime Distribution by Day")
+```
+
+Linear regression model:
+
+```{r Linear Model 1, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+Crimerate <- lm(Crime.Rate ~ PERCENT.OF.HOUSING.CROWDED + PERCENT.HOUSEHOLDS.BELOW.POVERTY + PERCENT.AGED.16..UNEMPLOYED + PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA + PERCENT.AGED.UNDER.18.OR.OVER.64 + PER.CAPITA.INCOME + HARDSHIP.INDEX, data = DF)
+summary(Crimerate)
+Crimerate$coefficients
+
+## stargazer was used to get organised output
+library(stargazer)
+stargazer(Crimerate, type = "html" ,align = TRUE)
+```
+
+The percentage of those below 18 and over 64, the percentage of those 25 and older without a high school diploma, and the hardship index have significant p-values and are strongly correlated with the crime rate. R-squared values range from 0 to 1. This model's R-squared value is 0.30, which indicates that it accounts for about 30% of the variation in the crime rate. 
+
+Formula:
+Y= 1709.67 X1 – 720.07 X2 + 774.56 X3 -1514.4 X4 – 1940.84 X5 + .276 X6 + 1037.88 X7 + 61481.64. This can be used for future crime predictions.
+(Y=crime rate, X1=Percent of housing crowded, X2=Households below poverty, X3=Aged 16 and unemployed, X4=Aged 25 above and no high school diploma, X5=Aged 18under or above 64, X6=Per capita income, X7=Hardship index.)
+
+When we take these three particular variables alone into consideration, the results will be:
+
+```{r Linear Model 2, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+CrimerateA <- lm(Crime.Rate ~ HARDSHIP.INDEX + PERCENT.AGED.UNDER.18.OR.OVER.64 + PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA, data = DF)
+summary(CrimerateA)
+library(stargazer)
+stargazer(CrimerateA, type = "html" ,align = TRUE)
+```
+
+From the output, we can see that 25% of the crimes are related to hardship index, meaning people aged under 18 or over 64 and those aged 25 without a high school diploma. Simple linear regression was carried out and results are shown below:
+
+#Analyzing each independent variable
+
+```{r Linear Model 3, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+Crimerate1 <- lm(Crime.Rate ~ PERCENT.OF.HOUSING.CROWDED , data = DF)
+summary(Crimerate1)
+
+Crimerate2 <- lm(Crime.Rate ~ PERCENT.HOUSEHOLDS.BELOW.POVERTY , data = DF)
+summary(Crimerate2)
+
+Crimerate3 <- lm(Crime.Rate ~ PERCENT.AGED.16..UNEMPLOYED , data = DF)
+summary(Crimerate3)
+
+Crimerate4 <- lm(Crime.Rate ~ PERCENT.AGED.25..WITHOUT.HIGH.SCHOOL.DIPLOMA, data = DF)
+summary(Crimerate4)
+
+Crimerate5 <- lm(Crime.Rate ~ PERCENT.AGED.UNDER.18.OR.OVER.64, data = DF)
+summary(Crimerate5)
+
+Crimerate6 <- lm(Crime.Rate ~ PER.CAPITA.INCOME, data = DF)
+summary(Crimerate6)
+
+Crimerate7 <- lm(Crime.Rate ~ HARDSHIP.INDEX, data = DF)
+summary(Crimerate7)
+```
+## Conclusion
+
+The findings show that more crimes occur on January 1st of every year compared to other days. The percentage of those aged 25 and older without a high school diploma, the percentage of those under 18 and over 64, and the level of hardship all have an impact on the prevalence of criminal activity in Chicago, as shown in a linear regression analysis. Hence, government officials can make plans and take action to reduce crime in the future. Future studies can use a more recent set of socioeconomic indicators with crime rates, as this study only used data from 2008 to 2012, which is available in the official site.
+
+# References
+
+1.Gahalot, A., Prathiba kumari., & Dhiman.S., (2020, February). Crime prediction and analysis. In 2nd International Conference on Data, Engineering and Applications (IDEA) 
+
+2.Shamsuddin, N. H. M., Ali, N. A., & Alwee, R. (2017, May). An overview on crime prediction methods. In 2017 6th ICT International Student Project Conference (ICT-ISPC) (pp. 1-5). IEEE.20
+
+3.Nwankwo, C. S., Raji, M. K., & Oghogho, E. S. (2018). Application of data analytics techniques in analyzing crimes. Tech. Rep.
+
+4.Sathyadevan, S., Devan, M. S., & Gangadharan, S. S. (2014, August). Crime analysis and prediction using data mining. In 2014 First international conference on networks & soft computing (ICNSC2014) (pp. 406-412). IEEE.
+
+5.Gorr, W., & Harries, R. (2003). Introduction to crime forecasting. International Journal of Forecasting, 19(4), 551-555.
+
+6.Peiris M.D.P.T, Shaminda M.B.D, Senarathne H.K, Dr. Gayana Fernando (2020 December) Crime Prediction and Analysis System (International Journal of Scientific and Research Publications, 546 ISSN 2250-3153 )
+
+7.ISR Data | Chicago Police Department
+
+8.Census Data - Selected socioeconomic indicators in Chicago, 2008 – 2012 | City of Chicago | Data Portal
+9.Crimes - 2001 to Present | City of Chicago | Data Portal
